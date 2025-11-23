@@ -10,7 +10,7 @@ from torch.nn.utils.rnn import pad_sequence
 from causallearn.search.ConstraintBased.FCI import fci
 from causallearn.search.ScoreBased.GES import ges
 from causallearn.search.PermutationBased.GRaSP import grasp
-from gies import fit_bic
+from ..gies import fit_bic
 
 
 edge_map_fci = {
