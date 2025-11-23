@@ -9,6 +9,7 @@ which is arguably horrible and clever hehe.
 import os
 from functools import partial
 from contextlib import redirect_stdout
+import math
 
 import numpy as np
 import pytorch_lightning as pl
@@ -43,7 +44,7 @@ class DataModule(pl.LightningDataModule):
         class BaseTestDataset(BaseDataset, TestDataset):
             pass
 
-        train_len = ceil(len(train_batched_data) * 0.8)
+        train_len = math.ceil(len(train_batched_data) * 0.8)
         val_len = len(train_batched_data) - train_len
         self.subset_train = BaseTrainDataset(train_batched_data[:train_len], train_batched_graphs[:train_len], args,
                 splits_to_load=["train"])
