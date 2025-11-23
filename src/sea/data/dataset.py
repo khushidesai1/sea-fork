@@ -110,18 +110,12 @@ class MetaDataset(Dataset):
         self.splits = defaultdict(list)
         self.data = []
         # create individual Dataset objects
-        for data, graph, fp_regimes in tqdm(zip(batched_data, batched_graphs, batched_regimes)):
-            if args.algorithm == "gies":
-                self.data.append(InterventionalDataset(data,
-                                                       graph,
-                                                       fp_regimes,
-                                                       args.algorithm))
-            else:
-                self.data.append(ObservationalDataset(data,
-                                                      graph,
-                                                      args.algorithm))
-            if args.debug and len(self.data) > 100:
-                break
+        if args.algorithm == "gies":
+            for data, graph, fp_regimes in tqdm(zip(batched_data, batched_graphs, batched_regimes)):
+                self.data.append(InterventionalDataset(data, graph, fp_regimes, args.algorithm))
+        else:
+            for data, graph in tqdm(zip(batched_data, batched_graphs)):
+                self.data.append(ObservationalDataset(data, graph, args.algorithm))
         # initialize per-class
         self.sampler_classes = None
         self._run_alg = get_run_alg(args.algorithm)
