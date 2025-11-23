@@ -32,7 +32,7 @@ dependencies = [
   "seaborn",
   "torch==1.13.1",
   "torchvision",
-  "torchaudio==0.13.1",
+  "torchaudio",
   "pytorch-lightning==1.9.0",
   "torchmetrics==1.3.0",
   "causal-learn==0.1.3.7",
