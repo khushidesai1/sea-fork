@@ -54,8 +54,8 @@ Additional modules / packages:
 """
 
 import numpy as np
-import gies.utils as utils
-from gies.scores.gauss_int_l0_pen import GaussIntL0Pen
+import .utils as utils
+from .scores.gauss_int_l0_pen import GaussIntL0Pen
 
 
 def fit_bic(
