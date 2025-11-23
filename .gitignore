@@ -3,3 +3,4 @@ wandb
 **.swo
 **.pyc
 **.pkl
+**/*.egg-info
