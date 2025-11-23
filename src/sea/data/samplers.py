@@ -18,7 +18,7 @@ from pulp.apis import PULP_CBC_CMD
 
 from .utils import collate
 from .utils import convert_to_graphs, convert_to_item
-from model import get_model_cls
+from ..model import get_model_cls
 
 
 class DatasetSampler:
