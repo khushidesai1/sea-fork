@@ -103,7 +103,7 @@ class MetaDataset(Dataset):
     """
         Dataset of datasets
     """
-    def __init__(self, batched_data, batched_graphs, batched_regimes, args, splits_to_load=None):
+    def __init__(self, batched_data, batched_graphs, args, splits_to_load=None, batched_regimes=None):
         super().__init__()
         # read raw data
         self.args = args
@@ -165,8 +165,8 @@ class TrainDataset(MetaDataset):
     """
         Sample varying # of batches per individual dataset
     """
-    def __init__(self, batched_data, batched_graphs, batched_regimes, args, splits_to_load=None):
-        super().__init__(batched_data, batched_graphs, batched_regimes, args, splits_to_load)
+    def __init__(self, batched_data, batched_graphs, args, splits_to_load=None, batched_regimes=None):
+        super().__init__(batched_data, batched_graphs, args, splits_to_load=splits_to_load, batched_regimes=batched_regimes)
 
     def __getitem__(self, idx):
         dataset = self.data[idx]
