@@ -54,7 +54,7 @@ Additional modules / packages:
 """
 
 import numpy as np
-import .utils as utils
+from .utils import *
 from .scores.gauss_int_l0_pen import GaussIntL0Pen
 
 
