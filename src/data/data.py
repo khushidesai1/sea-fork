@@ -30,13 +30,12 @@ def get_base_dataset(algorithm):
 
 
 class DataModule(pl.LightningDataModule):
-    def __init__(self, args):
+    def __init__(self, train_batched_data, test_batched_data, train_batched_graphs, test_batched_graphs, args):
         super().__init__()
         self.args = args
         self.seed = args.seed
         self.batch_size = args.batch_size
         self.num_workers = args.num_workers
-        self.data_file = args.data_file
 
         BaseDataset = get_base_dataset(args.algorithm)
         class BaseTrainDataset(BaseDataset, TrainDataset):
@@ -44,11 +43,13 @@ class DataModule(pl.LightningDataModule):
         class BaseTestDataset(BaseDataset, TestDataset):
             pass
 
-        self.subset_train = BaseTrainDataset(self.data_file, args,
+        train_len = ceil(len(train_batched_data) * 0.8)
+        val_len = len(train_batched_data) - train_len
+        self.subset_train = BaseTrainDataset(train_batched_data[:train_len], train_batched_graphs[:train_len], args,
                 splits_to_load=["train"])
-        self.subset_val = BaseTestDataset(self.data_file, args,
+        self.subset_val = BaseTestDataset(train_batched_data[train_len:], train_batched_graphs[train_len:], args,
                 splits_to_load=["val"])
-        self.subset_test = BaseTestDataset(self.data_file, args,
+        self.subset_test = BaseTestDataset(test_batched_data, test_batched_graphs, args,
                 splits_to_load=["test"])
 
     def train_dataloader(self):
