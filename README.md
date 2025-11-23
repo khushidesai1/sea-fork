@@ -1,4 +1,7 @@
-# Sample, estimate, aggregate: A recipe for causal discovery foundation models
+# Forked SEA
+Forked repository of SEA foundation model (https://github.com/rmwu/sea-reproduce) modified to be an installable Python package and added custom data loading for benchmarking.
+
+## Sample, estimate, aggregate: A recipe for causal discovery foundation models
 
 Official implementation of SEA (under review).
 
