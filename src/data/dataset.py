@@ -30,12 +30,11 @@ from utils import read_csv
 
 
 class InterventionalDataset(Dataset):
-    def __init__(self, fp_data, fp_graph, fp_regime, algorithm):
+    def __init__(self, data, graph, fp_regimes, algorithm):
         super().__init__()
         # read raw data
-        self.key = fp_graph.split("/")[-2]
-        self.data = np.load(fp_data)
-        self.graph = torch.from_numpy(np.load(fp_graph)).long()
+        self.data = data
+        self.graph = torch.from_numpy(graph).long()
         self.num_vars = self.data.shape[1]
         self.num_edges = self.graph.sum()
         self.algorithm = algorithm
@@ -45,19 +44,19 @@ class InterventionalDataset(Dataset):
         with open(fp_regime) as f:
             # if >1 node intervened, formatted as a list
             lines = [line.strip() for line in f.readlines()]
-        regimes = [tuple(sorted(int(x) for x in line.split(",")))
+        fp_regimes = [tuple(sorted(int(x) for x in line.split(",")))
                 if len(line) > 0 else () for line in lines]
-        assert len(regimes) == len(self.data)
+        assert len(fp_regimes) == len(self.data)
 
         # get unique and map to nodes
-        unique_regimes = sorted(set(regimes))  # first is obs
+        unique_regimes = sorted(set(fp_regimes))  # first is obs
         self.idx_to_regime = {i: reg for i, reg in enumerate(unique_regimes)}
         self.regime_to_idx = {reg: i for i, reg in enumerate(unique_regimes)}
         self.num_regimes = len(self.idx_to_regime)
 
         # map regimes to dataset
         self.regimes = defaultdict(list)
-        for i, reg in enumerate(regimes):
+        for i, reg in enumerate(fp_regimes):
             self.regimes[self.regime_to_idx[reg]].append(i)
         self.regimes = {reg: np.array(idx, dtype=int) for reg, idx in
                 self.regimes.items()}  # convert to np.ndarray
@@ -81,12 +80,11 @@ class InterventionalDataset(Dataset):
 
 
 class ObservationalDataset(Dataset):
-    def __init__(self, fp_data, fp_graph, algorithm):
+    def __init__(self, data, graph, algorithm):
         super().__init__()
         # read raw data
-        self.key = fp_graph.split("/")[-2]
-        self.data = np.load(fp_data)
-        self.graph = torch.from_numpy(np.load(fp_graph)).long()
+        self.data = data
+        self.graph = torch.from_numpy(graph).long()
         self.num_vars = self.data.shape[1]
         self.num_edges = self.graph.sum()
         self.algorithm = algorithm
@@ -106,28 +104,22 @@ class MetaDataset(Dataset):
     """
         Dataset of datasets
     """
-    def __init__(self, data_file, args, splits_to_load=None):
+    def __init__(self, batched_data, batched_graphs, batched_regimes, args, splits_to_load=None):
         super().__init__()
         # read raw data
         self.args = args
-        self.data_file = data_file
-        data_to_load = read_csv(self.data_file)
         self.splits = defaultdict(list)
         self.data = []
         # create individual Dataset objects
-        for item in tqdm(data_to_load, ncols=40):
-            split = item["split"]
-            if splits_to_load is not None and split not in splits_to_load:
-                continue
-            self.splits[split].append(len(self.data))
+        for data, graph, fp_regimes in tqdm(zip(batched_data, batched_graphs, batched_regimes)):
             if args.algorithm == "gies":
-                self.data.append(InterventionalDataset(item["fp_data"],
-                                                       item["fp_graph"],
-                                                       item["fp_regime"],
+                self.data.append(InterventionalDataset(data,
+                                                       graph,
+                                                       fp_regimes,
                                                        args.algorithm))
             else:
-                self.data.append(ObservationalDataset(item["fp_data"],
-                                                      item["fp_graph"],
+                self.data.append(ObservationalDataset(data,
+                                                      graph,
                                                       args.algorithm))
             if args.debug and len(self.data) > 100:
                 break
@@ -174,8 +166,8 @@ class TrainDataset(MetaDataset):
     """
         Sample varying # of batches per individual dataset
     """
-    def __init__(self, data_file, args, splits_to_load=None):
-        super().__init__(data_file, args, splits_to_load)
+    def __init__(self, batched_data, batched_graphs, batched_regimes, args, splits_to_load=None):
+        super().__init__(batched_data, batched_graphs, batched_regimes, args, splits_to_load)
 
     def __getitem__(self, idx):
         dataset = self.data[idx]
@@ -193,8 +185,8 @@ class TestDataset(MetaDataset):
     """
         Sample fixed # of batches per individual dataset
     """
-    def __init__(self, data_file, args, splits_to_load=None):
-        super().__init__(data_file, args, splits_to_load)
+    def __init__(self, batched_data, batched_graphs, batched_regimes, args, splits_to_load=None):
+        super().__init__(batched_data, batched_graphs, batched_regimes, args, splits_to_load)
 
     def __getitem__(self, idx):
         dataset = self.data[idx]
