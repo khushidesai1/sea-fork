@@ -62,7 +62,7 @@ def train_sea(
     train_batched_graphs,
     test_batched_graphs,
     sea_data_module_params,
-    device=device,
+    device = "cuda",
 ):
     """
     Train the SEA model given batched node features/graphs and a parameter dict.
@@ -332,4 +332,3 @@ def run_sea_on_test(
                 results_dict[k].append(v)
 
     return dict(results_dict)
-    
