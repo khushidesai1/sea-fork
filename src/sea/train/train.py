@@ -62,6 +62,7 @@ def train_sea(
     train_batched_graphs,
     test_batched_graphs,
     sea_data_module_params,
+    device=device,
 ):
     """
     Train the SEA model given batched node features/graphs and a parameter dict.
@@ -218,3 +219,117 @@ def train_sea(
     printt("SEA training complete.")
 
     return model
+
+
+def load_sea_model(model_weights_path, sea_data_module_args):
+    """
+    Load a trained SEA model from a checkpoint, given the arguments that were
+    used during training.
+
+    Parameters
+    ----------
+    model_weights_path:
+        Path to the Lightning checkpoint produced by ``train_sea`` (or the
+        original training script).
+    sea_data_module_args:
+        A ``dict`` or ``argparse.Namespace`` containing the SEA arguments
+        that were used for training and pickled to disk. This should be the
+        same object you pass / saved as ``sea_data_module_args`` in your
+        Snakemake pipeline.
+
+    Returns
+    -------
+    model:
+        The SEA LightningModule restored from the checkpoint, in eval mode.
+    """
+    if not os.path.exists(model_weights_path):
+        raise FileNotFoundError(f"Checkpoint not found: {model_weights_path}")
+
+    # Rebuild args in the same way as for training, so we know which model
+    # class to instantiate (aggregator vs baseline, etc.).
+    args = _build_args_from_params(sea_data_module_args)
+
+    base_model = load_model(args)
+    model = base_model.load_from_checkpoint(model_weights_path)
+    model.eval()
+    return model
+
+
+def run_sea_on_test(
+    test_batched_data,
+    test_batched_graphs,
+    sea_data_module_params,
+    model,
+    device: str = "cuda",
+):
+    """
+    Run a trained SEA model on *only* the test batched data/graphs.
+
+    This builds a temporary ``DataModule`` whose predict dataloader is backed
+    by ``test_batched_*`` and uses PyTorch Lightning's ``Trainer.predict``
+    to obtain the model outputs.
+
+    Parameters
+    ----------
+    test_batched_data, test_batched_graphs:
+        Lists/arrays of node features and adjacency matrices for the test set.
+    sea_data_module_params:
+        Same params object (dict or Namespace) you used for training /
+        constructing ``sea_data_module_args``.
+    model:
+        A trained SEA model (e.g., from ``train_sea`` or ``load_sea_model``).
+    device:
+        "cuda" / "gpu" (default) or "cpu".
+
+    Returns
+    -------
+    results:
+        A dict with aggregated prediction outputs over the test set. The
+        ``"pred"`` entries correspond to the per-edge predictions returned
+        by the SEA model (same format as in the original ``inference.py``).
+    """
+    # Rebuild args so that DataModule behavior (samplers, batch sizes, etc.)
+    # matches what was used during training.
+    args = _build_args_from_params(sea_data_module_params)
+
+    # Dummy/empty train split; we only care about subset_test / predict_dataloader
+    data_module = DataModule(
+        train_batched_data=[],
+        test_batched_data=test_batched_data,
+        train_batched_graphs=[],
+        test_batched_graphs=test_batched_graphs,
+        args=args,
+    )
+
+    # Configure accelerator/devices
+    if device in ["cuda", "gpu"]:
+        accelerator = "gpu"
+        devices = [getattr(args, "gpu", 0)]
+    else:
+        accelerator = "cpu"
+        devices = None
+
+    trainer_kwargs = {
+        "accelerator": accelerator,
+        "enable_checkpointing": False,
+        "logger": False,
+    }
+    if devices is not None:
+        trainer_kwargs["devices"] = devices
+
+    tester = pl.Trainer(**trainer_kwargs)
+    outputs = tester.predict(model, data_module)
+
+    # Aggregate over test batches (mirror style of ``inference.py``)
+    from collections import defaultdict as _dd
+
+    results_dict = _dd(list)
+    for batch in outputs:
+        for k, v in batch.items():
+            if isinstance(v, list):
+                results_dict[k].extend(v)
+            else:
+                results_dict[k].append(v)
+
+    return dict(results_dict)
+    
