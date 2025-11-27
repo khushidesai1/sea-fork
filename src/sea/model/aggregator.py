@@ -23,7 +23,7 @@ from torchmetrics.classification import BinaryAccuracy
 
 from .axial import AxialTransformer, TopLayer
 from .utils import get_params_groups
-from .metrics import shd_metric
+from .metrics import shd_metric, shd_from_flat
 
 
 class Aggregator(pl.LightningModule):
@@ -46,6 +46,7 @@ class Aggregator(pl.LightningModule):
         self.auroc = BinaryAUROC()
         self.auprc = BinaryAveragePrecision()
         self.acc = BinaryAccuracy()
+        # keep a handle to the base SHD function (on adjacency matrices)
         self.shd = shd_metric
 
         self.save_hyperparameters()
@@ -137,8 +138,17 @@ class Aggregator(pl.LightningModule):
             auroc.append(self.auroc(p, t).item())
             auprc.append(self.auprc(p, t).item())
             acc.append(self.acc(p, t).item())
-            p_binary = (p > 0.5).float()
-            shd.append(self.shd(p_binary, t).item())
+
+            # Compute SHD in the same way as in examples/SEA-results.ipynb:
+            #   - interpret p and t as flat per-edge scores (both directions),
+            #   - convert to adjacency matrices,
+            #   - threshold predictions at 0.5, then apply SHD.
+            shd_val = shd_from_flat(
+                t.detach().numpy(),
+                p.detach().numpy(),
+                threshold=0.5,
+            )
+            shd.append(float(shd_val))
             if save_preds:
                 pred_list.append(p.tolist())
                 true_list.append(t.tolist())
