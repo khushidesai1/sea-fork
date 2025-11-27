@@ -24,7 +24,7 @@ from torchmetrics.classification import BinaryAccuracy
 
 from .axial import AxialTransformer, TopLayer
 from .utils import get_params_groups
-from sea.cdt.metrics import SHD
+from .metrics import shd_metric
 
 
 class Aggregator(pl.LightningModule):
@@ -47,7 +47,7 @@ class Aggregator(pl.LightningModule):
         self.auroc = BinaryAUROC()
         self.auprc = BinaryAveragePrecision()
         self.acc = BinaryAccuracy()
-        self.shd = SHD
+        self.shd = shd_metric
 
         self.save_hyperparameters()
 
@@ -138,7 +138,7 @@ class Aggregator(pl.LightningModule):
             auroc.append(self.auroc(p, t).item())
             auprc.append(self.auprc(p, t).item())
             acc.append(self.acc(p, t).item())
-            shd.append(self.shd(t, p, double_for_anticausal=False).item())
+            shd.append(self.shd(t, p).item())
             if save_preds:
                 pred_list.append(p.tolist())
                 true_list.append(t.tolist())
