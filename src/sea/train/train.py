@@ -16,6 +16,7 @@ from pytorch_lightning.callbacks import (
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 from .utils import printt, get_suffix
+from .args import get_parser, process_args
 from sea.model import load_model
 from sea.data import DataModule
 
