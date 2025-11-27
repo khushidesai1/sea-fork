@@ -259,6 +259,7 @@ class MetaObservationalDataset(MetaDataset):
                 continue
             order = torch.from_numpy(order).long()
             results.append((G, order))
+        print(results)
         return results
 
 
