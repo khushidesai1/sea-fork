@@ -55,7 +55,7 @@ import uuid
 from shutil import copy, rmtree
 from pathlib import Path
 from tempfile import gettempdir
-import cdt.utils.Settings
+import .Settings
 
 
 def message_warning(msg, *a, **kwargs):
