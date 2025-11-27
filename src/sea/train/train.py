@@ -161,7 +161,6 @@ def train_sea(
     cb_lr = LearningRateMonitor(logging_interval="step")
 
     callbacks = [
-        RichProgressBar(),
         cb_checkpoint,
         cb_earlystop,
         # cb_lr  # enable if you want LR logging
