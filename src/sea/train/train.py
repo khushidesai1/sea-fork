@@ -178,7 +178,6 @@ def train_sea(
         # logging and saving
         "callbacks": callbacks,
         "log_every_n_steps": args.log_frequency,
-        "fast_dev_run": args.debug,
         "logger": wandb_logger,
         # GPU utilization
         "devices": device_ids,
