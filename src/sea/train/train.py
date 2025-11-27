@@ -124,7 +124,7 @@ def train_sea(
     printt("Finished loading model.")
 
     # Logger
-    if args.debug:
+    if args.use_wandb:
         wandb_logger = None
     else:
         run_id = str(time.time())
