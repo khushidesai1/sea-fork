@@ -3,7 +3,7 @@ import sys
 import yaml
 import argparse
 
-from utils import printt
+from .utils import printt
 
 
 def get_parser():
