@@ -24,6 +24,7 @@ from torchmetrics.classification import BinaryAccuracy
 
 from .axial import AxialTransformer, TopLayer
 from .utils import get_params_groups
+from .cdt.metrics import SHD
 
 
 class Aggregator(pl.LightningModule):
@@ -46,6 +47,7 @@ class Aggregator(pl.LightningModule):
         self.auroc = BinaryAUROC()
         self.auprc = BinaryAveragePrecision()
         self.acc = BinaryAccuracy()
+        self.shd = SHD
 
         self.save_hyperparameters()
 
@@ -120,7 +122,7 @@ class Aggregator(pl.LightningModule):
         """
             Split up individual graphs from batch
         """
-        auroc, auprc, acc = [], [], []
+        auroc, auprc, acc, shd = [], [], [], []
         if save_preds:
             pred_list, true_list = [], []
         # do not reduce over batch
@@ -136,6 +138,7 @@ class Aggregator(pl.LightningModule):
             auroc.append(self.auroc(p, t).item())
             auprc.append(self.auprc(p, t).item())
             acc.append(self.acc(p, t).item())
+            shd.append(self.shd(t, p, double_for_anticausal=False).item())
             if save_preds:
                 pred_list.append(p.tolist())
                 true_list.append(t.tolist())
@@ -144,6 +147,7 @@ class Aggregator(pl.LightningModule):
         outputs["auroc"] = auroc
         outputs["auprc"] = auprc
         outputs["acc"] = acc
+        outputs["shd"] = shd
         # need to save these...
         outputs["key"] = batch["key"]
         if save_preds:
@@ -161,8 +165,7 @@ class Aggregator(pl.LightningModule):
             return
         for k, v in losses.items():
             if not torch.is_tensor(v) or v.numel() == 1:
-                self.log(f"Train/{k}", v.item(),
-                    batch_size=len(output), sync_dist=True)
+                self.log(f"Train/{k}", v.item(), on_step=False, on_epoch=True)
         return losses["loss"]
 
     def validation_step(self, batch, batch_idx):
@@ -175,15 +178,13 @@ class Aggregator(pl.LightningModule):
             return
         for k, v in losses.items():
             if not torch.is_tensor(v) or v.numel() == 1:
-                self.log(f"Val/{k}", v.item(),
-                    batch_size=len(output), sync_dist=True)
+                self.log(f"Val/{k}", v.item(), on_step=False, on_epoch=True)
         # metrics
         results = self.compute_metrics_per_graph(output, batch,
                 save_preds=False)
         for k, v in results.items():
             if k != "key":
-                self.log(f"Val/{k}", np.mean(v),
-                    batch_size=len(output), sync_dist=True)
+                self.log(f"Val/{k}", np.mean(v), on_step=False, on_epoch=True)
 
     def configure_optimizers(self):
         param_groups = get_params_groups(self, self.args)
