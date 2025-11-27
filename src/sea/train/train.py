@@ -124,7 +124,7 @@ def train_sea(
     printt("Finished loading model.")
 
     # Logger
-    if args.use_wandb:
+    if not args.use_wandb:
         wandb_logger = None
     else:
         wandb_logger = WandbLogger(
