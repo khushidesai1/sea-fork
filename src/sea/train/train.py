@@ -134,7 +134,7 @@ def train_sea(
         )
         wandb_logger.watch(model)
         # Save checkpoints/run-specific files under a subdirectory
-        args.save_path = os.path.join(args.save_path, run_id)
+        args.save_path = os.path.join(args.save_path, args.run_name)
         os.makedirs(args.save_path, exist_ok=True)
 
     # Determine whether to maximize or minimize the monitored metric
