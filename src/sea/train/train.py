@@ -198,17 +198,6 @@ def train_sea(
     # Train
     trainer.fit(model, data_module, **fit_kwargs)
 
-    # Find best checkpoint
-    if not args.debug:
-        best_path = cb_checkpoint.best_model_path
-        printt(f"Best model checkpoint: {best_path}")
-    else:
-        best_path = None
-
-    # If we have a best checkpoint, load it before returning.
-    if best_path is not None:
-        model = model.load_from_checkpoint(best_path)
-
     # Freeze model and return for downstream pipelines (e.g., Snakemake)
     model.eval()
     printt("SEA training complete.")
