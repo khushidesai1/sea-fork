@@ -84,6 +84,7 @@ class ObservationalSampler(DatasetSampler):
             Called by Datasets
         """
         batches = []
+        last_idxs = None
         for i in range(num_batches):
             # sample dataset points
             idxs = np.random.choice(len(self.dataset), (batch_size,),
@@ -94,8 +95,9 @@ class ObservationalSampler(DatasetSampler):
             batch = self.dataset.data[idxs[:, np.newaxis], nodes]
             batches.append((batch, nodes))
             self.callback([(batch, nodes)])  # for learned sampler
+            last_idxs = idxs
         # compute global features based on last batch
-        feats = compute_features(self.dataset.data[idxs].T)
+        feats = compute_features(self.dataset.data[last_idxs].T)
         return batches, feats
 
 
