@@ -97,6 +97,7 @@ class ObservationalSampler(DatasetSampler):
             self.callback([(batch, nodes)])  # for learned sampler
             last_idxs = idxs
         # compute global features based on last batch
+        print(self.dataset.data.shape)
         feats = compute_features(self.dataset.data[last_idxs].T)
         return batches, feats
 
@@ -326,6 +327,7 @@ def compute_features(x):
     x: (num_vars, num_samples)
     """
     if x.shape[0] < 100:
+        print(x.shape)
         return np.linalg.pinv(np.cov(x), rcond=1e-10)
     lw = LedoitWolf()
     lw.fit(x.T)
