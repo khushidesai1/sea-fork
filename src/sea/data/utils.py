@@ -134,8 +134,10 @@ def run_ges(batch):
     try:
         output = ges(batch,
                      score_func="local_score_BIC")
+        print("we got some output")
         return output["G"].graph
     except:
+        print("ges had an error")
         return
 
 
