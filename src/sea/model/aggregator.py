@@ -8,7 +8,6 @@ produce final, global graph.
 import os
 import math
 import time
-import pdb
 import numpy as np
 import torch
 import torch.nn as nn
@@ -135,12 +134,11 @@ class Aggregator(pl.LightningModule):
             t = t.cpu()
             assert p.shape == t.shape
             # convert prediction to list
-            pdb.set_trace()
             auroc.append(self.auroc(p, t).item())
             auprc.append(self.auprc(p, t).item())
             acc.append(self.acc(p, t).item())
-            print("shd", self.shd(p, t).item())
-            shd.append(self.shd(p, t).item())
+            p_binary = (p > 0.5).float()
+            shd.append(self.shd(p_binary, t).item())
             if save_preds:
                 pred_list.append(p.tolist())
                 true_list.append(t.tolist())
