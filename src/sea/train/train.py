@@ -151,17 +151,17 @@ def train_sea(
         "dirpath": args.save_path,
         "save_last": True,
     }
-    cb_checkpoint = ModelCheckpoint(**checkpoint_kwargs)
+    # cb_checkpoint = ModelCheckpoint(**checkpoint_kwargs)
 
-    cb_earlystop = EarlyStopping(
-        monitor=args.metric,
-        patience=args.patience,
-        mode=mode,
-    )
+    # cb_earlystop = EarlyStopping(
+    #     monitor=args.metric,
+    #     patience=args.patience,
+    #     mode=mode,
+    # )
     cb_lr = LearningRateMonitor(logging_interval="step")
 
     callbacks = [
-        cb_checkpoint,
+        # cb_checkpoint,
         cb_earlystop,
         # cb_lr  # enable if you want LR logging
     ]
