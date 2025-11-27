@@ -44,11 +44,9 @@ class DataModule(pl.LightningDataModule):
         class BaseTestDataset(BaseDataset, TestDataset):
             pass
 
-        train_len = math.ceil(len(train_batched_data) * 0.8)
-        val_len = len(train_batched_data) - train_len
-        self.subset_train = BaseTrainDataset(train_batched_data[:train_len], train_batched_graphs[:train_len], args,
+        self.subset_train = BaseTrainDataset(train_batched_data, train_batched_graphs, args,
                 splits_to_load=["train"])
-        self.subset_val = BaseTestDataset(train_batched_data[train_len:], train_batched_graphs[train_len:], args,
+        self.subset_val = BaseTestDataset(test_batched_data, test_batched_graphs, args,
                 splits_to_load=["val"])
         self.subset_test = BaseTestDataset(test_batched_data, test_batched_graphs, args,
                 splits_to_load=["test"])
