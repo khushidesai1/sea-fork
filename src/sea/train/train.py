@@ -189,13 +189,8 @@ def train_sea(
     trainer = pl.Trainer(**trainer_kwargs)
     printt("Initialized trainer.")
 
-    # Resume training from checkpoint if requested
-    fit_kwargs = {}
-    if getattr(args, "checkpoint_path", "") and os.path.exists(args.checkpoint_path):
-        fit_kwargs["ckpt_path"] = args.checkpoint_path
-
     # Train
-    trainer.fit(model, data_module, **fit_kwargs)
+    trainer.fit(model, data_module)
 
     # Freeze model and return for downstream pipelines (e.g., Snakemake)
     model.eval()
