@@ -170,7 +170,7 @@ def train_sea(
     if args.no_tqdm:
         callbacks[0].disable()
 
-    device_ids = [gpu + i for i in range(num_gpu)]
+    device_ids = [gpu + i for i in range(args.num_gpus)]
 
     trainer_kwargs = {
         "max_epochs": args.epochs,
