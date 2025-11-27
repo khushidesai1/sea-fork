@@ -15,7 +15,6 @@ from pytorch_lightning.callbacks import (
 )
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
-from args import get_parser, process_args
 from utils import printt, get_suffix
 from sea.model import load_model
 from sea.data import DataModule
@@ -127,7 +126,6 @@ def train_sea(
     if args.use_wandb:
         wandb_logger = None
     else:
-        run_id = str(time.time())
         wandb_logger = WandbLogger(
             project=args.project_name,
             entity=getattr(args, "entity", None),
