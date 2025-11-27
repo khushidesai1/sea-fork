@@ -129,9 +129,9 @@ def train_sea(
     else:
         run_id = str(time.time())
         wandb_logger = WandbLogger(
-            project=args.run_name,
+            project=args.project_name,
             entity=getattr(args, "entity", None),
-            name=run_id,
+            name=args.run_name,
         )
         wandb_logger.watch(model)
         # Save checkpoints/run-specific files under a subdirectory
