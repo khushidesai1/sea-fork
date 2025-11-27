@@ -138,7 +138,7 @@ class Aggregator(pl.LightningModule):
             auroc.append(self.auroc(p, t).item())
             auprc.append(self.auprc(p, t).item())
             acc.append(self.acc(p, t).item())
-            shd.append(self.shd(t, p).item())
+            shd.append(self.shd(p, t).item())
             if save_preds:
                 pred_list.append(p.tolist())
                 true_list.append(t.tolist())
