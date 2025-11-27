@@ -111,11 +111,21 @@ class MetaDataset(Dataset):
         self.data = []
         # create individual Dataset objects
         if args.algorithm == "gies":
-            for data, graph, fp_regimes in tqdm(zip(batched_data, batched_graphs, batched_regimes)):
-                self.data.append(InterventionalDataset(data, graph, fp_regimes, args.algorithm))
+            for i, (data, graph, fp_regimes) in enumerate(
+                tqdm(zip(batched_data, batched_graphs, batched_regimes))
+            ):
+                ds = InterventionalDataset(data, graph, fp_regimes, args.algorithm)
+                # assign a unique key per underlying graph for downstream metrics
+                ds.key = f"graph_{i}"
+                self.data.append(ds)
         else:
-            for data, graph in tqdm(zip(batched_data, batched_graphs)):
-                self.data.append(ObservationalDataset(data, graph, args.algorithm))
+            for i, (data, graph) in enumerate(
+                tqdm(zip(batched_data, batched_graphs))
+            ):
+                ds = ObservationalDataset(data, graph, args.algorithm)
+                # assign a unique key per underlying graph for downstream metrics
+                ds.key = f"graph_{i}"
+                self.data.append(ds)
         # initialize per-class
         self.sampler_classes = None
         self._run_alg = get_run_alg(args.algorithm)
