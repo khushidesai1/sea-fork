@@ -134,10 +134,8 @@ def run_ges(batch):
     try:
         output = ges(batch,
                      score_func="local_score_BIC")
-        print("we got some output")
         return output["G"].graph
     except:
-        print("ges had an error")
         return
 
 
@@ -172,7 +170,6 @@ def collate(args, batch):
     batch = {key:[item[key] for item in batch if key in item] for key in keys}
     new_batch = {}
     for key, val in batch.items():
-        print(key, val)
         if not torch.is_tensor(val[0]) or val[0].ndim == 0:
             new_batch[key] = default_collate(val)
         # don't collate this; adjust based on train/val
