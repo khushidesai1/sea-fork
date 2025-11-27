@@ -24,7 +24,7 @@ from torchmetrics.classification import BinaryAccuracy
 
 from .axial import AxialTransformer, TopLayer
 from .utils import get_params_groups
-from .cdt.metrics import SHD
+from sea.cdt.metrics import SHD
 
 
 class Aggregator(pl.LightningModule):
@@ -165,7 +165,7 @@ class Aggregator(pl.LightningModule):
             return
         for k, v in losses.items():
             if not torch.is_tensor(v) or v.numel() == 1:
-                self.log(f"Train/{k}", v.item(), on_step=False, on_epoch=True)
+                self.log(f"Train/{k}", torch.tensor(v.item()), on_step=False, on_epoch=True)
         return losses["loss"]
 
     def validation_step(self, batch, batch_idx):
