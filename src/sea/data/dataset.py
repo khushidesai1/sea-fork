@@ -174,7 +174,6 @@ class TrainDataset(MetaDataset):
 
     def __getitem__(self, idx):
         dataset = self.data[idx]
-        print(dataset.data.shape)
         num_batches = np.random.randint(self.args.fci_batches,
                                         self.args.fci_batches * 5, 1).item()
         batches, corrs = self._sample_batches(dataset, num_batches)
