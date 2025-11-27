@@ -25,11 +25,11 @@ It is CUDA-compatible for the most computationally expensive algorithms.
 .. SOFTWARE.
 """
 
-import cdt.causality
-import cdt.independence
-import cdt.data
-import cdt.metrics
-from cdt.utils import loss
-from cdt.utils.Settings import SETTINGS
-from cdt.utils.R import RPackages
+from .causality import *
+from .independence import *
+from .data import *
+from .metrics import *
+from .utils import *
+from .utils.Settings import SETTINGS
+from .utils.R import RPackages
 __version__ = '0.6.0'
