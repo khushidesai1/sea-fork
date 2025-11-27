@@ -115,7 +115,6 @@ class MetaDataset(Dataset):
                 self.data.append(InterventionalDataset(data, graph, fp_regimes, args.algorithm))
         else:
             for data, graph in tqdm(zip(batched_data, batched_graphs)):
-                print(data.shape, graph.shape)
                 self.data.append(ObservationalDataset(data, graph, args.algorithm))
         # initialize per-class
         self.sampler_classes = None
@@ -165,6 +164,7 @@ class TrainDataset(MetaDataset):
 
     def __getitem__(self, idx):
         dataset = self.data[idx]
+        print(dataset.data.shape)
         num_batches = np.random.randint(self.args.fci_batches,
                                         self.args.fci_batches * 5, 1).item()
         batches, corrs = self._sample_batches(dataset, num_batches)
