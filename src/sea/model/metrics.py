@@ -4,6 +4,77 @@ Metrics for the SEA model.
 
 import numpy as np
 
+def precision(adj_pred, adj_true):
+    """
+    Calculates the precision of the predicted adjacency matrix.
+    Args:
+        adj_pred: has shape N x N, the predicted adjacency matrix
+        adj_true: has shape N x N, the true adjacency matrix
+    Returns:
+        precision: float, the precision of the predicted adjacency matrix
+    """
+    device = adj_pred.device
+    pred = adj_pred != 0
+    true = adj_true != 0
+
+    tp = (pred & true).sum().to(torch.float32)
+    fp = (pred & ~true).sum().to(torch.float32)
+
+    denom = tp + fp
+    zero = torch.zeros((), device=device, dtype=torch.float32)
+    prec = torch.where(denom > 0, tp / denom, zero)
+    return prec
+
+
+def recall(adj_pred, adj_true):
+    """
+    Calculates the recall of the predicted adjacency matrix.
+    Args:
+        adj_pred: has shape N x N, the predicted adjacency matrix
+        adj_true: has shape N x N, the true adjacency matrix
+    Returns:
+        recall: float, the recall of the predicted adjacency matrix
+    """
+    device = adj_pred.device
+    pred = adj_pred != 0
+    true = adj_true != 0
+
+    tp = (pred & true).sum().to(torch.float32)
+    fn = ((~pred) & true).sum().to(torch.float32)
+
+    denom = tp + fn
+    zero = torch.zeros((), device=device, dtype=torch.float32)
+    rec = torch.where(denom > 0, tp / denom, zero)
+    return rec
+
+
+def f1_score(adj_pred, adj_true):
+    """
+    Calculates the F1 score of the predicted adjacency matrix.
+    Args:
+        adj_pred: has shape N x N, the predicted adjacency matrix
+        adj_true: has shape N x N, the true adjacency matrix
+    Returns:
+        f1_score: float, the F1 score of the predicted adjacency matrix
+    """
+    device = adj_pred.device
+    # Compute precision and recall using the same binarization rules
+    pred = adj_pred != 0
+    true = adj_true != 0
+
+    tp = (pred & true).sum().to(torch.float32)
+    fp = (pred & ~true).sum().to(torch.float32)
+    fn = ((~pred) & true).sum().to(torch.float32)
+
+    prec_denom = tp + fp
+    rec_denom = tp + fn
+    zero = torch.zeros((), device=device, dtype=torch.float32)
+    prec = torch.where(prec_denom > 0, tp / prec_denom, zero)
+    rec = torch.where(rec_denom > 0, tp / rec_denom, zero)
+
+    denom = prec + rec
+    f1 = torch.where(denom > 0, 2.0 * prec * rec / denom, zero)
+    return f1
 
 def shd_metric(adj_pred, adj_true):
     """
