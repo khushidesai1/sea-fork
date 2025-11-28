@@ -122,7 +122,7 @@ class Aggregator(pl.LightningModule):
         """
             Split up individual graphs from batch
         """
-        auroc, auprc, acc, shd, f1, precision, recall = [], [], [], [], [], [], []
+        auroc, auprc, acc, shd, f1s, precisions, recalls = [], [], [], [], [], [], []
         if save_preds:
             pred_list, true_list = [], []
         # do not reduce over batch
@@ -139,9 +139,9 @@ class Aggregator(pl.LightningModule):
             auprc.append(self.auprc(p, t).item())
             acc.append(self.acc(p, t).item())
 
-            f1.append(f1_score(_flat_to_adj(t), _flat_to_adj(p)))
-            precision.append(precision(_flat_to_adj(t), _flat_to_adj(p)))
-            recall.append(recall(_flat_to_adj(t), _flat_to_adj(p)))
+            f1s.append(f1_score(_flat_to_adj(t), _flat_to_adj(p)))
+            precisions.append(precision(_flat_to_adj(t), _flat_to_adj(p)))
+            recalls.append(recall(_flat_to_adj(t), _flat_to_adj(p)))
 
             # Compute SHD in the same way as in examples/SEA-results.ipynb:
             #   - interpret p and t as flat per-edge scores (both directions),
@@ -162,9 +162,9 @@ class Aggregator(pl.LightningModule):
         outputs["auprc"] = auprc
         outputs["acc"] = acc
         outputs["shd"] = shd
-        outputs["f1"] = f1
-        outputs["precision"] = precision
-        outputs["recall"] = recall
+        outputs["f1s"] = f1s
+        outputs["precisions"] = precisions
+        outputs["recalls"] = recalls
         # need to save these...
         outputs["key"] = batch["key"]
         if save_preds:
