@@ -139,9 +139,9 @@ class Aggregator(pl.LightningModule):
             auprc.append(self.auprc(p, t).item())
             acc.append(self.acc(p, t).item())
 
-            f1.append(f1_score(_flat_to_adj(t), _flat_to_adj(p)).item())
-            precision.append(precision(_flat_to_adj(t), _flat_to_adj(p)).item())
-            recall.append(recall(_flat_to_adj(t), _flat_to_adj(p)).item())
+            f1.append(f1_score(_flat_to_adj(t), _flat_to_adj(p)))
+            precision.append(precision(_flat_to_adj(t), _flat_to_adj(p)))
+            recall.append(recall(_flat_to_adj(t), _flat_to_adj(p)))
 
             # Compute SHD in the same way as in examples/SEA-results.ipynb:
             #   - interpret p and t as flat per-edge scores (both directions),
