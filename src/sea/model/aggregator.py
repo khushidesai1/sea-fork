@@ -23,7 +23,7 @@ from torchmetrics.classification import BinaryAccuracy
 
 from .axial import AxialTransformer, TopLayer
 from .utils import get_params_groups
-from .metrics import shd_metric, shd_from_flat, f1_score, _flat_to_adj
+from .metrics import shd_metric, shd_from_flat, f1_score, _flat_to_adj, precision, recall
 
 
 class Aggregator(pl.LightningModule):
