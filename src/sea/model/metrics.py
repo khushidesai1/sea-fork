@@ -65,7 +65,7 @@ def f1_score(adj_pred, adj_true):
 
     prec_denom = tp + fp
     rec_denom = tp + fn
-    zero = torch.zeros(())
+    zero = np.zeros(())
     prec = np.where(prec_denom > 0, tp / prec_denom, zero)
     rec = np.where(rec_denom > 0, tp / rec_denom, zero)
 
