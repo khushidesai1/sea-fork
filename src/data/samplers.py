@@ -133,7 +133,7 @@ class InterventionalSampler(DatasetSampler):
                 idxs = np.random.choice(self.dataset.regimes[reg],
                                         points_per_env,
                                         replace=False)[:, np.newaxis]
-            batch.append(self.dataset.data[idxs, nodes])
+                batch.append(self.dataset.data[idxs, nodes])
             # add observational
             idxs = np.random.choice(self.dataset.regimes[0],
                                     points_per_env,
