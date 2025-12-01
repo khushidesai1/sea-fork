@@ -2,6 +2,7 @@
     Variety of sampling mechanisms
 """
 
+import pdb
 import time
 import math
 import itertools
@@ -130,6 +131,7 @@ class InterventionalSampler(DatasetSampler):
             batch = []
             for reg in reg_idx:
                 # sample dataset points
+                pdb.set_trace()
                 idxs = np.random.choice(self.dataset.regimes[reg],
                                         points_per_env,
                                         replace=False)[:, np.newaxis]
