@@ -123,6 +123,8 @@ class InterventionalSampler(DatasetSampler):
                 for _ in range(num_vars_batch - len(reg_idx)):
                     reg_idx.append(0)  # observational
             else:
+                print(len(sorted(set(reg_idx))))
+                print(num_vars_batch)
                 reg_idx = np.random.choice(sorted(set(reg_idx)),
                                            num_vars_batch,
                                            replace=False)
