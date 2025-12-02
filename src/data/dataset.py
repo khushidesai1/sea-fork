@@ -140,6 +140,7 @@ class MetaDataset(Dataset):
         if self.sampler_classes is None:
             raise Exception("MetaDataset did not initialize sampler_classes")
         # sample batches per sampler
+        print(num_batches // len(self.sampler_classes))
         kwargs = {
             "num_batches": num_batches // len(self.sampler_classes),
             "batch_size": self.args.fci_batch_size,
