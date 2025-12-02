@@ -56,11 +56,12 @@ def main():
     printt("Finished loading model.")
 
     # logger
-    if args.debug:
+    if not args.wandb:
         wandb_logger = None
     else:
         name = str(time.time())
         wandb_logger = WandbLogger(project=args.run_name,
+                                   entity="mv-causal",
                                    name=name)
         wandb_logger.watch(model)  # gradients
         args.save_path = os.path.join(args.save_path, name)

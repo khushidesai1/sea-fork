@@ -151,12 +151,9 @@ def run_grasp(batch):
 
 
 def run_gies(batch, regime):
-    try:
-        graph, score = fit_bic(data=batch, I=regime, A0=None,
-                phases=["forward", "backward", "turning"],
-                iterate=True, debug=0)  # a real verbose flag!
-    except:
-        return
+    graph, score = fit_bic(data=batch, I=regime, A0=None,
+            phases=["forward", "backward", "turning"],
+            iterate=True, debug=0)  # a real verbose flag!
     return graph.astype(int)
 
 

@@ -63,7 +63,6 @@ class DataModule(pl.LightningDataModule):
 
     def val_dataloader(self):
         # batch_size smaller since we sample more batches on average
-        print(len(self.subset_val))
         val_loader = DataLoader(self.subset_val,
                                 batch_size=max(self.batch_size // 4, 1),
                                 num_workers=max(self.num_workers // 4, 1),

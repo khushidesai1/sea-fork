@@ -51,6 +51,7 @@ class InterventionalDataset(Dataset):
 
         # get unique and map to nodes
         unique_regimes = sorted(set(regimes))  # first is obs
+
         self.idx_to_regime = {i: reg for i, reg in enumerate(unique_regimes)}
         self.regime_to_idx = {reg: i for i, reg in enumerate(unique_regimes)}
         self.num_regimes = len(self.idx_to_regime)
@@ -140,7 +141,6 @@ class MetaDataset(Dataset):
         if self.sampler_classes is None:
             raise Exception("MetaDataset did not initialize sampler_classes")
         # sample batches per sampler
-        print(num_batches // len(self.sampler_classes))
         kwargs = {
             "num_batches": num_batches // len(self.sampler_classes),
             "batch_size": self.args.fci_batch_size,
@@ -162,6 +162,7 @@ class MetaDataset(Dataset):
                 batches.extend(sampler.sample_batches(**kwargs)[0])
             # update counts if necessary
             visit_counts = sampler.visit_counts
+
         return batches, feats
 
     def __len__(self):

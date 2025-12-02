@@ -118,9 +118,9 @@ class InterventionalSampler(DatasetSampler):
             for v in nodes:
                 reg_idx.extend(self.dataset.node_to_regime[v])
             # for Sachs
-            if len(reg_idx) < num_vars_batch:
+            if len(set(reg_idx)) < num_vars_batch:
                 reg_idx = sorted(set(reg_idx))
-                for _ in range(num_vars_batch - len(reg_idx)):
+                for _ in range(num_vars_batch - len(set(reg_idx))):
                     reg_idx.append(0)  # observational
             else:
                 reg_idx = np.random.choice(sorted(set(reg_idx)),
@@ -155,7 +155,6 @@ class InterventionalSampler(DatasetSampler):
         idxs = np.random.choice(len(self.dataset), (batch_size,),
                 replace=False)
         feats = compute_features(self.dataset.data[idxs].T)
-
         return batches, feats
 
 

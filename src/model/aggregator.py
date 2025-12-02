@@ -24,6 +24,7 @@ from torchmetrics.classification import BinaryAccuracy
 
 from .axial import AxialTransformer, TopLayer
 from .utils import get_params_groups
+from .utils import compute_additional_metrics
 
 
 class Aggregator(pl.LightningModule):
@@ -120,7 +121,7 @@ class Aggregator(pl.LightningModule):
         """
             Split up individual graphs from batch
         """
-        auroc, auprc, acc = [], [], []
+        auroc, auprc, acc, shd_list,  = [], [], [], []
         if save_preds:
             pred_list, true_list = [], []
         # do not reduce over batch
@@ -133,6 +134,8 @@ class Aggregator(pl.LightningModule):
             t = t.cpu()
             assert p.shape == t.shape
             # convert prediction to list
+            shd, f1, precision, recall = compute_additional_metrics(t, p)
+            shd_list.append(shd)
             auroc.append(self.auroc(p, t).item())
             auprc.append(self.auprc(p, t).item())
             acc.append(self.acc(p, t).item())
@@ -144,6 +147,7 @@ class Aggregator(pl.LightningModule):
         outputs["auroc"] = auroc
         outputs["auprc"] = auprc
         outputs["acc"] = acc
+        outputs["shd"] = shd_list
         # need to save these...
         outputs["key"] = batch["key"]
         if save_preds:
