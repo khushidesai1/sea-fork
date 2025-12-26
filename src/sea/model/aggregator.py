@@ -121,7 +121,7 @@ class Aggregator(pl.LightningModule):
         """
             Split up individual graphs from batch
         """
-        auroc, auprc, acc, shd_list,  = [], [], [], []
+        auroc, auprc, acc, shd_list, f1_list, precision_list, recall_list = [], [], [], [], [], [], []
         if save_preds:
             pred_list, true_list = [], []
         # do not reduce over batch
@@ -136,6 +136,9 @@ class Aggregator(pl.LightningModule):
             # convert prediction to list
             shd, f1, precision, recall = compute_additional_metrics(t, p)
             shd_list.append(shd)
+            f1_list.append(f1)
+            precision_list.append(precision)
+            recall_list.append(recall)
             auroc.append(self.auroc(p, t).item())
             auprc.append(self.auprc(p, t).item())
             acc.append(self.acc(p, t).item())
@@ -148,6 +151,9 @@ class Aggregator(pl.LightningModule):
         outputs["auprc"] = auprc
         outputs["acc"] = acc
         outputs["shd"] = shd_list
+        outputs["f1"] = f1_list
+        outputs["precision"] = precision_list
+        outputs["recall"] = recall_list
         # need to save these...
         outputs["key"] = batch["key"]
         if save_preds:

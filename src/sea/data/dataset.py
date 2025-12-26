@@ -23,7 +23,7 @@ from torch.utils.data import Dataset
 from . import samplers
 from .utils import run_fci, run_ges, run_gies, run_grasp
 from .utils import convert_to_graphs, convert_to_item
-from utils import read_csv
+from ..utils import read_csv
 
 
 # ======== Start of individual datasets ========
